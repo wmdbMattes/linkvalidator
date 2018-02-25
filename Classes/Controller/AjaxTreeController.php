@@ -19,7 +19,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\Page\TreeController;
 use TYPO3\CMS\Backend\Controller\UserSettingsController;
+use TYPO3\CMS\Backend\Tree\Repository\PageTreeRepository;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
 
@@ -67,7 +70,7 @@ class AjaxTreeController extends TreeController
         $entryPoints = $this->getPagesWithLinkErrors();
         $items = [];
         foreach ($entryPoints as $page) {
-            $page['_children'] = [];
+//            $page['_children'] = [];
             $items = array_merge($items, $this->pagesToFlatArray($page, (int)$page['uid']));
         }
 
@@ -76,7 +79,14 @@ class AjaxTreeController extends TreeController
 
     protected function getPagesWithLinkErrors(): array
     {
-        $repository = new LinkResultRepository();
-        return $repository->getPageIdsWithLinkErrors();
+        $linkResultRepository = new LinkResultRepository();
+        $pagesWithErrors = $linkResultRepository->getPageIdsWithLinkErrors();
+        foreach ($pagesWithErrors as $key => $pageRow) {
+            $rootLine = BackendUtility::BEgetRootLine($pageRow['uid']);
+            foreach ($rootLine as $item) {
+                $pagesWithErrors[] = $item;
+            }
+        }
+        return $pagesWithErrors;
     }
 }
