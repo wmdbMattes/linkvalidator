@@ -1,0 +1,36 @@
+{
+	"name": "typo3/cms-linkvalidator",
+	"type": "typo3-cms-framework",
+	"description": "Link Validator checks the links in your website for validity. It can validate all kinds of links: internal, external and file links. Scheduler is supported to run Link Validator via Cron including the option to send status mails, if broken links were detected.",
+	"homepage": "https://typo3.org",
+	"license": ["GPL-2.0-or-later"],
+	"authors": [{
+			"name": "TYPO3 Core Team",
+			"email": "typo3cms@typo3.org",
+			"role": "Developer"
+		}],
+
+	"require": {
+		"typo3/cms-core": "9.2.*@dev",
+		"typo3/cms-info": "9.2.*@dev"
+	},
+	"conflict": {
+		"typo3/cms": "*"
+	},
+	"replace": {
+		"linkvalidator": "*"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "9.2.x-dev"
+		},
+		"typo3/cms": {
+			"extension-key": "linkvalidator"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"TYPO3\\CMS\\Linkvalidator\\": "Classes/"
+		}
+	}
+}

@@ -1,0 +1,57 @@
+<div class="resultBox">
+    <h3><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:report.statistics.header" /></h3>
+    <table class="table">
+        <tr>
+            <td><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:overviews.nbtotal" /></td>
+            <td>{totalCount}</td>
+            <td>&nbsp;</td>
+        </tr>
+        <f:for each="{linkTypeResults}" as="linkTypeResult">
+            <tr>
+                <td>
+                    <!-- This needs to be checked if localLang overrides work here -->
+                    <f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:hooks.{linkTypeResult.type}" />
+                </td>
+                <td>{linkTypeResult.count}</td>
+                <td><a class="btn btn-primary" href="#">Rescan all <f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:hooks.{linkTypeResult.type}" /></a></td>
+            </tr>
+        </f:for>
+    </table>
+</div>
+<a href="#" class="btn btn-primary refresh">Refresh</a>
+<div id="t3js-linkvalidator-ajaxresults"></div>
+
+<f:if condition="{results}">
+    <f:then>
+        <h3><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.header"/></h3>
+        <table class="table table-striped table-hover" id="linkvalidator-broken-links-table">
+            <thead>
+            <tr>
+                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/></th>
+                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.path"/></th>
+                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.headlink"/></th>
+                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.linktarget"/></th>
+                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.linkmessage"/></th>
+                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.lastcheck"/></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <f:for each="{results}" as="result">
+                <tr>
+                    <td>###ACTIONLINKOPEN######ELEMENT######ACTIONLINKCLOSE###</td>
+                    <td>###PATH###</td>
+                    <td>###HEADLINK###</td>
+                    <td><a href="###LINKTARGET###" target="_blank">###LINKTARGET###</a></td>
+                    <td>###LINKMESSAGE###</td>
+                    <td>###LASTCHECK###</td>
+                    <td>###ACTIONLINKOPEN######ACTIONLINKICON######ACTIONLINKCLOSE###</td>
+                </tr>
+            </f:for>
+            </tbody>
+        </table>
+    </f:then>
+    <f:else>
+        No broken links found
+    </f:else>
+</f:if>
