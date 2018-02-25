@@ -54,6 +54,7 @@ class LinkResultRepository
             ->getQueryBuilderForTable('tx_linkvalidator_link');
         $queryBuilder
             ->select('p.*')
+            ->addSelectLiteral('COUNT(*) AS _amountOfBrokenLinks')
             ->from('tx_linkvalidator_link', 'l')
             ->innerJoin('l', 'pages', 'p', 'p.uid = l.record_pid')
             ->groupBy('record_pid');
