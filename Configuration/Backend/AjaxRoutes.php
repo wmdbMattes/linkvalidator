@@ -20,4 +20,12 @@ return [
         'path' => '/linkvalidator/scan/single',
         'target' => \TYPO3\CMS\Linkvalidator\Controller\LinkValidatorAjaxController::class . '::scanSingleAction'
     ],
+    'linkvalidator_get_tree' => [
+        'path' => '/linkvalidator/tree',
+        'target' => \TYPO3\CMS\Linkvalidator\Controller\AjaxTreeController::class . '::fetchDataAction'
+    ],
+    'linkvalidator_get_treeconfiguration' => [
+        'path' => '/linkvalidator/tree',
+        'target' => \TYPO3\CMS\Linkvalidator\Controller\AjaxTreeController::class . '::fetchConfigurationAction'
+    ],
 ];

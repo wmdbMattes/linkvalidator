@@ -47,4 +47,16 @@ class LinkResultRepository
         }
         return $queryBuilder->execute();
     }
+
+    public function getPageIdsWithLinkErrors(): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_linkvalidator_link');
+        $queryBuilder
+            ->select('p.*')
+            ->from('tx_linkvalidator_link', 'l')
+            ->innerJoin('l', 'pages', 'p', 'p.uid = l.record_pid')
+            ->groupBy('record_pid');
+        return $queryBuilder->execute()->fetchAll();
+    }
 }

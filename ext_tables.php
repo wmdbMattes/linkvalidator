@@ -25,6 +25,7 @@ defined('TYPO3_MODE') or die();
         'access' => 'group,user',
         'name' => 'site_linkvalidator',
         'icon' => 'EXT:linkvalidator/Resources/Public/Icons/Extension.svg',
+        'navigationComponentId' => 'TYPO3/CMS/Linkvalidator/LinkvalidatorTree',
         'labels' => 'LLL:EXT:linkvalidator/Resources/Private/Language/locallang_module_linkvalidator.xlf'
     ]
 );
