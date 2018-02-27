@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace TYPO3\CMS\Linkvalidator\Analyzer;
+namespace TYPO3\CMS\Linkvalidator\LinkChecker;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -58,7 +58,7 @@ class LinkChecker
      * Stores in LinkResultRepository.
      */
     // was: LinkAnalyzer->getLinkStatistics()
-    public function updateBrokenLinks()
+    public function checkBrokenLinks()
     {
         // iterate through tables-> fields
         // use list of pids

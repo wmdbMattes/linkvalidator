@@ -63,6 +63,8 @@ class LinkCheckProperties
      *
      * @param array $props
      * @param array $tsConfig
+     *
+     * @todo handle TSconfig
      */
     public function __construct(array $props, $tsConfig = [])
     {
@@ -79,5 +81,86 @@ class LinkCheckProperties
             $this->inHiddenPages = $props['inHiddenPages'];
         }
     }
+
+    /**
+     * @return array
+     */
+    public function getLinkTypes(): array
+    {
+        return $this->linkTypes;
+    }
+
+    /**
+     * @param array $linkTypes
+     */
+    public function setLinkTypes(array $linkTypes)
+    {
+        $this->linkTypes = $linkTypes;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSearchLevels(): int
+    {
+        return $this->searchLevels;
+    }
+
+    /**
+     * @param int $searchLevels
+     */
+    public function setSearchLevels(int $searchLevels)
+    {
+        $this->searchLevels = $searchLevels;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStartPage(): int
+    {
+        return $this->startPage;
+    }
+
+    /**
+     * @param int $startPage
+     */
+    public function setStartPage(int $startPage)
+    {
+        $this->startPage = $startPage;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInHiddenPages(): bool
+    {
+        return $this->inHiddenPages;
+    }
+
+    /**
+     * @param bool $inHiddenPages
+     */
+    public function setInHiddenPages(bool $inHiddenPages)
+    {
+        $this->inHiddenPages = $inHiddenPages;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSearchFields(): array
+    {
+        return $this->searchFields;
+    }
+
+    /**
+     * @param array $searchFields
+     */
+    public function setSearchFields(array $searchFields)
+    {
+        $this->searchFields = $searchFields;
+    }
+
 
 }

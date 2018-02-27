@@ -15,8 +15,9 @@
 namespace TYPO3\CMS\Linkvalidator\Tests\Linktype;
 
 use TYPO3\CMS\Linkvalidator\Linktype\ExternalLinktype;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class ExternalLinktypeTest extends \TYPO3\TestingFramework\Core\Unit\UnitTestCase
+class ExternalLinktypeTest extends UnitTestCase
 {
 
     public function fetchTypeDataProvider()
