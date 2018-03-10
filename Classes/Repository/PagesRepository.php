@@ -28,7 +28,7 @@ class PagesRepository
     /**
      * @var QueryBuilder
      */
-    $protected $queryBuilder = false;
+    protected $queryBuilder = false;
 
 
     /**
@@ -53,10 +53,10 @@ class PagesRepository
      */
     protected function getQueryBuilder() : QueryBuilder
     {
-        if ($queryBuilder === false) {
+        if ($this->queryBuilder === false) {
             $this->initializeQueryBuilder();
         }
-        return $this->getQueryBuilder();
+        return $this->queryBuilder;
     }
 
 
@@ -86,15 +86,16 @@ class PagesRepository
             $whereField = 'uid';
         }
 
-        $rows = $this->getPages($fields = ['uid'], $whereField,(string)$startPage,  $perms, $checkHidden);
+        $rows = $this->getPages($whereField,(string)$startPage,  $perms, $checkHidden);
 
-        while ($row = $rows->fetch()) {
-            if ($depth > 0 ) {
+        foreach ($rows as $row) {
+            if ($depth > 0) {
                 $results = array_merge($results,
-                    $this->getPagesRecursive($row['uid'], depth -1, $checkHidden, $perms));
+                    $this->getPagesRecursive((int)$row['uid'], $depth - 1, $checkHidden, $perms));
             }
-            $results[] = $row;
         }
+        $results = array_merge($results, $rows);
+
         return $results;
     }
 
@@ -109,7 +110,6 @@ class PagesRepository
      * - getRootlineIsHidden
      * - extendToSubpages
      *
-     *
      * @param string $whereValue
      * @param string $whereField
      * @param int $perms
@@ -119,9 +119,8 @@ class PagesRepository
      * @throws InvalidArgumentException
      */
     public function getPages(
-        string $fields = ['uid' , 'title', 'hidden', 'extendToSubpages'],
         string $whereField, string $whereValue,
-        int $perms, bool $checkHidden)
+        int $perms, bool $checkHidden): array
     {
         $results = [];
         $permsClause = "$perms=$perms";
@@ -136,8 +135,7 @@ class PagesRepository
         }
 
         $result = $queryBuilder
-            //->select('uid', 'title', 'hidden', 'extendToSubpages')
-            ->select('uid')
+            ->select('uid', 'title', 'hidden', 'extendToSubpages')
             ->from('pages')
             ->where(
                 $queryBuilder->expr()->eq(
@@ -146,12 +144,50 @@ class PagesRepository
                 ),
                 QueryHelper::stripLogicalOperatorPrefix($permsClause)
             )
-            ->execute();
+            ->execute()->fetchAll();
 
-        while ($row = $result->fetch()) {
-            $results[] = $row;
+        return $result;
+    }
+
+    /**
+     * Check if rootline contains a hidden page
+     *
+     * @param array $pageInfo Array with uid, title, hidden, extendToSubpages from pages table
+     * @return bool TRUE if rootline contains a hidden page, FALSE if not
+     *
+     * @todo Does this really make sense here? Instead of checking if page in
+     * rootline is hidden, we should not traverse into hidden page subtrees
+     * in the first place if checkHidden is false!
+     */
+    public function getRootLineIsHidden(array $pageInfo)
+    {
+        $hidden = false;
+        if ($pageInfo['extendToSubpages'] == 1 && $pageInfo['hidden'] == 1) {
+            $hidden = true;
+        } else {
+            if ($pageInfo['pid'] > 0) {
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+                $queryBuilder->getRestrictions()->removeAll();
+
+                $row = $queryBuilder
+                    ->select('uid', 'title', 'hidden', 'extendToSubpages')
+                    ->from('pages')
+                    ->where(
+                        $queryBuilder->expr()->eq(
+                            'uid',
+                            $queryBuilder->createNamedParameter($pageInfo['pid'], \PDO::PARAM_INT)
+                        )
+                    )
+                    ->execute()
+                    ->fetch();
+
+                if ($row !== false) {
+                    $hidden = $this->getRootLineIsHidden($row);
+                }
+            }
         }
-        return $results;
+
+        return $hidden;
     }
 
 }
