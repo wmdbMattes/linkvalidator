@@ -59,6 +59,16 @@ class LinkCheckProperties
     protected $searchFields;
 
     /**
+     * Permissions of records to process.
+     *
+     * 1 - read permission
+     * 3 - read + write permission
+     *
+     * @var int
+     */
+    protected $perms = 3;
+
+    /**
      * LinkCheckProperties constructor.
      *
      * @param array $props
@@ -79,6 +89,9 @@ class LinkCheckProperties
         }
         if (isset($props['inHiddenPages'])) {
             $this->inHiddenPages = $props['inHiddenPages'];
+        }
+        if (isset($props['perms'])) {
+            $this->perms = $props['perms'];
         }
     }
 
@@ -161,6 +174,23 @@ class LinkCheckProperties
     {
         $this->searchFields = $searchFields;
     }
+
+    /**
+     * @return int
+     */
+    public function getPerms(): int
+    {
+        return $this->perms;
+    }
+
+    /**
+     * @param int $perms
+     */
+    public function setPerms(int $perms): void
+    {
+        $this->perms = $perms;
+    }
+
 
 
 }

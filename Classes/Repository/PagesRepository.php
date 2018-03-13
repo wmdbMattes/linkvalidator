@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
+use TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException;
 
 class PagesRepository
 {
@@ -31,14 +32,6 @@ class PagesRepository
     protected $queryBuilder = false;
 
 
-    /**
-     * Initialize QueryBuider to a default
-     */
-    protected function initializeQueryBuilder()
-    {
-        $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('pages');
-    }
 
     /**
      * @param QueryBuilder $queryBuilder
@@ -49,24 +42,15 @@ class PagesRepository
     }
 
     /**
-     * @return QueryBuilder
-     */
-    protected function getQueryBuilder() : QueryBuilder
-    {
-        if ($this->queryBuilder === false) {
-            $this->initializeQueryBuilder();
-        }
-        return $this->queryBuilder;
-    }
-
-
-    /**
      * Returns array of page ids
      *
      * @param int $startPage
      * @param int $depth (0: current page only etc.)
      * @param bool $checkHidden
      * @param int $perms
+     *   -1: do not check user access
+     *   1: read access,
+     *   3: read/write access.
      *
      * @return array
      *
@@ -74,8 +58,10 @@ class PagesRepository
      * @todo need to check extendToSubpages?
      *
      * (see extGetTreeList, checkPageLinks)
+     *
+     * @throws InvalidArgumentException
      */
-    public function getPagesRecursive(int $startPage, int $depth, bool $checkHidden, int $perms = 1): array
+    public function getPagesRecursive(int $startPage, int $depth, bool $checkHidden, int $perms): array
     {
 
         $results = [];
@@ -100,6 +86,7 @@ class PagesRepository
     }
 
 
+
     /**
      * Constraints:
      * - uid= or pid=
@@ -122,8 +109,10 @@ class PagesRepository
         string $whereField, string $whereValue,
         int $perms, bool $checkHidden): array
     {
-        $results = [];
-        $permsClause = "$perms=$perms";
+        $permsClause = '';
+        if ($perms !== -1) {
+            $permsClause = "$perms=$perms";
+        }
         $queryBuilder = $this->getQueryBuilder();
 
         $queryBuilder->getRestrictions()
@@ -134,17 +123,30 @@ class PagesRepository
                 ->add(GeneralUtility::makeInstance(HiddenRestriction::class));
         }
 
-        $result = $queryBuilder
-            ->select('uid', 'title', 'hidden', 'extendToSubpages')
-            ->from('pages')
-            ->where(
-                $queryBuilder->expr()->eq(
-                    $whereField,
-                    $queryBuilder->createNamedParameter($whereValue, \PDO::PARAM_INT)
-                ),
-                QueryHelper::stripLogicalOperatorPrefix($permsClause)
-            )
-            ->execute()->fetchAll();
+        if ($permsClause) {
+            $result = $queryBuilder
+                ->select('uid', 'title', 'hidden', 'extendToSubpages')
+                ->from('pages')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        $whereField,
+                        $queryBuilder->createNamedParameter($whereValue, \PDO::PARAM_INT)
+                    ),
+                    QueryHelper::stripLogicalOperatorPrefix($permsClause)
+                )
+                ->execute()->fetchAll();
+        } else {
+            $result = $queryBuilder
+                ->select('uid', 'title', 'hidden', 'extendToSubpages')
+                ->from('pages')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        $whereField,
+                        $queryBuilder->createNamedParameter($whereValue, \PDO::PARAM_INT)
+                    )
+                )
+                ->execute()->fetchAll();
+        }
 
         return $result;
     }
@@ -190,4 +192,24 @@ class PagesRepository
         return $hidden;
     }
 
+    /**
+     * @return QueryBuilder
+     */
+    protected function getQueryBuilder() : QueryBuilder
+    {
+        if ($this->queryBuilder === false) {
+            $this->initializeQueryBuilder();
+        }
+        return $this->queryBuilder;
+    }
+
+
+    /**
+     * Initialize QueryBuider to a default
+     */
+    protected function initializeQueryBuilder()
+    {
+        $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('pages');
+    }
 }

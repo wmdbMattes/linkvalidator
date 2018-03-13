@@ -56,13 +56,23 @@ class LinkChecker
     /**
      * Recheck for broken links using current $properties.
      * Stores in LinkResultRepository.
+     * * Iterate through tables-> fields
+     * * use list of pids
+     * * consider hooks
+     *
+     * @param int $startPage
+     * @param int $
+     *
+     *
+     * @todo delete existing links
      */
-    // was: LinkAnalyzer->getLinkStatistics()
-    public function checkBrokenLinks()
+    public function checkBrokenLinks(int $startPage, int depth=-1)
     {
-        // iterate through tables-> fields
-        // use list of pids
-        // consider hooks
+       $pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
+       $pages = $pagesRepository->getPagesRecursive($startPage, $depth, $properties->isInHiddenPages(), $properties->getPerms());
+
+
+
     }
 
     /**

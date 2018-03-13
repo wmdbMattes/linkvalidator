@@ -19,6 +19,9 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Repository for broken links.
+ */
 class LinkResultRepository
 {
     public function getResults(array $linkTypes, array $pageList, int $page = 0): array
