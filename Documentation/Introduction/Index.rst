@@ -9,14 +9,15 @@
 
 .. _introduction:
 
+============
 Introduction
-------------
+============
 
 
 .. _about-this-document:
 
 About this document
-^^^^^^^^^^^^^^^^^^^
+===================
 
 Linkvalidator is a system extension which enables you to conveniently
 check your website for broken links. This manual explains how to
@@ -26,7 +27,7 @@ install and configure the extension for your needs.
 .. _what-does-it-do:
 
 What does it do?
-^^^^^^^^^^^^^^^^
+================
 
 Linkvalidator checks the links in your website for validity, reports
 broken links or missing files in your TYPO3 installation and provides
@@ -54,7 +55,7 @@ It includes the following features:
 .. _screenshots:
 
 Screenshots
-^^^^^^^^^^^
+===========
 
 This is the linkvalidator backend module. It is located inside the
 info module and by default provides two tabs: "Report" and "Check
@@ -111,6 +112,13 @@ the linkvalidator task:
   located in typo3/sysext/linkvalidator/res/mailtemplate.html.
 
 
+Common terms
+============
+
+* **broken link** : a link that is checked to be false which means HTTP status code != 200
+* **linkcheck run** : one entire crawl for broken links across the entire site
+
+
 .. _credits:
 
 Credits
@@ -125,10 +133,10 @@ König.
 .. _feedback:
 
 Feedback
-^^^^^^^^
+========
 
 If you find a bug in this manual or in the extension in general,
-please file an issue in the bug tracker of this extension:
-`http://forge.typo3.org/projects/extension-linkvalidator/issues
-<http://forge.typo3.org/projects/extension-linkvalidator/issues>`_
+please file an issue in the bug tracker of the TYPO3 core:
+`https://forge.typo3.org/projects/typo3cms-core/issues
+<https://forge.typo3.org/projects/typo3cms-core/issues>`_
 

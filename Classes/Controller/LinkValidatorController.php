@@ -21,6 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Imaging\Icon;
@@ -102,6 +103,7 @@ class LinkValidatorController
 
     /**
      * @param string $templateName
+     * @todo think about (and simplify) serialized array in url_response
      */
     protected function initializeView(string $templateName): void
     {
@@ -111,10 +113,19 @@ class LinkValidatorController
         $this->view->setPartialRootPaths(['EXT:linkvalidator/Resources/Private/Partials']);
         $this->view->setLayoutRootPaths(['EXT:linkvalidator/Resources/Private/Layouts']);
 
-
-        $this->view->assign('test', 'testtest');
         $results = $this->LinkResultRepository->findAllResults();
+
+        // todo: simplify error result
+        foreach ($results as $key =>$result) {
+            $result['errormessage'] = unserialize($result['url_response'])['errorParams']['message'];
+            if (strlen($result['headline']) > 50) {
+                $result['headline'] = substr($result['headline'], 0, 47) . '...';
+            }
+            $result['path'] = BackendUtility::getRecordPath($result['record_pid'], '', 0,0);
+            $results[$key] = $result;
+        }
         $this->view->assign('results', $results);
+        $this->view->assign('totalCount', count($results));
 
     }
 

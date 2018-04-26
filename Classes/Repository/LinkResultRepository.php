@@ -24,28 +24,38 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LinkResultRepository
 {
-    /**
-     * @param int $limit
-     * @todo  returns \Doctrine\DBAL\Driver\Statement|int or array?
-     */
-    public function findAllResults(int $limit = 0) : array
+    /** @var TYPO3\CMS\Core\Database\Query\QueryBuilder */
+    protected $queryBuilder;
+
+
+    public function __construct()
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_linkvalidator_link');
-        $queryBuilder
+    }
+
+    public function findAllResults(int $startResult=0, int $maxResults = 0) : array
+    {
+        $this->queryBuilder
             ->select('*')
             ->from('tx_linkvalidator_link')
             ->orderBy('record_pid')
             ->addOrderBy('record_uid');
-
-        if ($limit) {
-            $queryBuilder->setMaxResult($limit);
+        if ($maxResults) {
+            $this->queryBuilder->setMaxResult($maxResults);
         }
-
-        return $queryBuilder->execute()
+        if ($startResult) {
+            $this->queryBuilder->setFirstResult($startResult);
+        }
+        return $this->queryBuilder->execute()
             ->fetchAll();
     }
 
+    public function removeAll()
+    {
+        $this->queryBuilder->delete('tx_linkvalidator_link')
+            ->execute();
+    }
 
     /**
      * @param array $linkTypes
@@ -56,28 +66,28 @@ class LinkResultRepository
      */
     public function getResults(array $linkTypes, array $pageList, int $page = 0): array
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_linkvalidator_link');
-        $queryBuilder
+        $this->queryBuilder
             ->select('*')
             ->from('tx_linkvalidator_link')
             ->where(
-                $queryBuilder->expr()->in(
+                $this->queryBuilder->expr()->in(
                     'record_pid',
-                    $queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
+                    $this->queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
                 )
             )
             ->orderBy('record_pid')
             ->addOrderBy('record_uid');
 
         if (!empty($linkTypes)) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->in(
+            $this->queryBuilder->andWhere(
+                $this->queryBuilder->expr()->in(
                     'link_type',
-                    $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+                    $this->queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
                 )
             );
         }
-        return $queryBuilder->execute();
+        return $this->queryBuilder->execute();
     }
 }

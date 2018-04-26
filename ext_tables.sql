@@ -13,11 +13,16 @@
 # - link_title     : anchor text
 # - url_response   : serialized array containing errorType and error message
 # - link_type      : external, page, file or any of the custom link types
+#
+# NEW
+# - record_sys_language_id : we need language of record
+
 
 CREATE TABLE tx_linkvalidator_link (
   uid           int(11) NOT NULL auto_increment,
   record_uid    int(11) DEFAULT '0' NOT NULL,
   record_pid    int(11) DEFAULT '0' NOT NULL,
+  record_sys_language_uid  int(11) DEFAULT '0' NOT NULL,
   headline      varchar(255) DEFAULT '' NOT NULL,
   field         varchar(255) DEFAULT '' NOT NULL,
   table_name    varchar(255) DEFAULT '' NOT NULL,

@@ -88,7 +88,7 @@
 				<source>Path</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.element">
-				<source>Element</source>
+				<source>Element title</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.headlink">
 				<source>Link</source>
@@ -99,8 +99,11 @@
 			<trans-unit id="list.tableHead.linkmessage">
 				<source>Error message</source>
 			</trans-unit>
-			<trans-unit id="list.tableHead.lastCheck">
+			<trans-unit id="list.tableHead.lastcheck">
 				<source>Last check</source>
+			</trans-unit>
+			<trans-unit id="list.tableHead.actions">
+				<source>Actions</source>
 			</trans-unit>
 			<trans-unit id="list.edit">
 				<source>Edit element containing this broken link</source>
@@ -184,7 +187,7 @@
 				<source>Exception: %s</source>
 			</trans-unit>
 			<trans-unit id="list.report.networkexception">
-				<source>Network error</source>
+				<source>Network error / invalid domain</source>
 			</trans-unit>
 			<trans-unit id="list.msg.ok">
 				<source>Ok</source>

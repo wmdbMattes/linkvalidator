@@ -1,0 +1,50 @@
+# Default configuration for Linkvalidator
+
+linkvalidator:
+  checklinks:
+    # todo: provide additional query parameters, e.g.
+    # condition for field
+    searchFieldsExtended:
+      pages:
+        pageurl:
+          field: url
+          where: doktype=3
+        mediaUrl:
+          field: url
+      tt_content:
+        text:
+          field: bodytext
+          # only regard ctype / list_type where bodytext is relevant, e.g. textmedia
+          #where:
+
+    searchFields:
+      pages:
+        fields:
+          - media
+          - url
+      tt_content:
+        fields:
+          - bodytext
+          - header_link
+          - records
+      tt_news:
+        fields:
+          - bodytext
+          - links
+    linktypes:
+      - db
+      - file
+      - external
+    checkhidden: 0
+
+  reportlinks:
+    showCheckLinkTab: 0
+
+  mail:
+   fromname: Linkvalidator
+   fromemail: Linkvalidator@example.com
+   replytoname:
+   replytoemail:
+   subject: TYPO3 Linkvalidator report
+
+# linkhandler.reportHiddenRecords = 0
