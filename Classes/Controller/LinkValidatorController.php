@@ -28,6 +28,7 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
 use TYPO3Fluid\Fluid\View\ViewInterface;
 
 class LinkValidatorController
@@ -55,11 +56,17 @@ class LinkValidatorController
     protected $iconFactory;
 
     /**
+     * @var LinkResultRepository
+     */
+    protected $LinkResultRepository;
+
+    /**
      * Instantiate the form protection before a simulated user is initialized.
      */
     public function __construct()
     {
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+        $this->LinkResultRepository = GeneralUtility::makeInstance(LinkResultRepository::class);
         $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/Modal');
         $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Linkvalidator/LinkValidator');
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
@@ -103,6 +110,12 @@ class LinkValidatorController
         $this->view->setTemplateRootPaths(['EXT:linkvalidator/Resources/Private/Templates/']);
         $this->view->setPartialRootPaths(['EXT:linkvalidator/Resources/Private/Partials']);
         $this->view->setLayoutRootPaths(['EXT:linkvalidator/Resources/Private/Layouts']);
+
+
+        $this->view->assign('test', 'testtest');
+        $results = $this->LinkResultRepository->findAllResults();
+        $this->view->assign('results', $results);
+
     }
 
     /**

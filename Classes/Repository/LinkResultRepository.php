@@ -24,6 +24,36 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LinkResultRepository
 {
+    /**
+     * @param int $limit
+     * @todo  returns \Doctrine\DBAL\Driver\Statement|int or array?
+     */
+    public function findAllResults(int $limit = 0) : array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_linkvalidator_link');
+        $queryBuilder
+            ->select('*')
+            ->from('tx_linkvalidator_link')
+            ->orderBy('record_pid')
+            ->addOrderBy('record_uid');
+
+        if ($limit) {
+            $queryBuilder->setMaxResult($limit);
+        }
+
+        return $queryBuilder->execute()
+            ->fetchAll();
+    }
+
+
+    /**
+     * @param array $linkTypes
+     * @param array $pageList
+     * @param int $page
+     * @return array
+     * @deprecated this function is currently not used, check if it can be removed!
+     */
     public function getResults(array $linkTypes, array $pageList, int $page = 0): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -37,8 +67,8 @@ class LinkResultRepository
                     $queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
                 )
             )
-            ->orderBy('record_uid')
-            ->addOrderBy('uid');
+            ->orderBy('record_pid')
+            ->addOrderBy('record_uid');
 
         if (!empty($linkTypes)) {
             $queryBuilder->andWhere(
