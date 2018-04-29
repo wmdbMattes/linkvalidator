@@ -3,6 +3,7 @@
 <f:debug title="results">{results}</f:debug>
 
 <f:comment>
+    ---------- DISABLED -----------
     DRAFT 1
 
     <div class="resultBox">
@@ -25,6 +26,7 @@
             </f:for>
         </table>
     </div>
+    ----------------------------------
 </f:comment>
 
 <div class="resultBox">
@@ -41,7 +43,10 @@
                     <f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:hooks.{linkTypeResult.type}" />
                 </td>
                 <td>{linkTypeResult.count}</td>
-                <td><a class="btn btn-primary" href="#">Rescan all <f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:hooks.{linkTypeResult.type}" /></a></td>
+                <td>
+                    <a class="btn btn-primary" href="#">Rescan all <f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:hooks.{linkTypeResult.type}" />
+                    </a>
+                </td>
             </tr>
         </f:for>
     </table>
@@ -49,6 +54,11 @@
 
 
 <a href="#" class="btn btn-primary refresh">Refresh</a>
+
+<a href="#" class="btn btn-primary scanall">Full rescan</a>
+
+<a href="#" class="btn btn-primary scanincremental">Incremental rescan</a>
+
 <div id="t3js-linkvalidator-ajaxresults"></div>
 
 <f:if condition="{results}">
@@ -74,13 +84,19 @@
                     <td>
                         <a href="{lv:recordAction(command: 'edit', uid: result.record_uid, pid: result.record_pid, table: result.table_name)}"
                            title="{f:translate(key: 'LLL:EXT:lang/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
+                            <core:icon identifier="mimetypes-x-content-text-picture" />
+                            <f:comment>
+                                <core:icon identifier="mimetypes-other-other" />
+                            </f:comment>
                             {result.headline}
                         </a>
                     </td>
                     <td>{result.path}</td>
                     <td>
                         <core:icon identifier="overlay-external-link" />
-                        <a href="{result.url}" target="_blank">{result.link_title}</a>
+                        <a href="{result.url}" target="_blank">{result.link_title}</a>:
+                        <br/>
+                        <a href="{result.url}" target="_blank">{result.url}</a>
                     </td>
                     <td>
                         <core:icon identifier="overlay-warning" />
@@ -111,7 +127,7 @@
                                 <core:icon identifier="actions-open" />
                             </a>
 
-                            <f:comment>TODO: translation missing</f:comment>
+                            <f:comment>TODO: create and insert language key here</f:comment>
                             <a class="btn btn-default"
                                href=""
                                title="Recheck link">

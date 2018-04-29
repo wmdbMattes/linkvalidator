@@ -15,7 +15,9 @@
 # - link_type      : external, page, file or any of the custom link types
 #
 # NEW
-# - record_sys_language_id : we need language of record
+# - record_sys_language_uid : we need language of record
+# - record_path : path of record (rootline)
+# - record_type : e.g. textmedia (for tt_content + ctype='textmedia'), plugin (for ctype='list')
 
 
 CREATE TABLE tx_linkvalidator_link (
@@ -23,6 +25,8 @@ CREATE TABLE tx_linkvalidator_link (
   record_uid    int(11) DEFAULT '0' NOT NULL,
   record_pid    int(11) DEFAULT '0' NOT NULL,
   record_sys_language_uid  int(11) DEFAULT '0' NOT NULL,
+  record_path   varchar(255) DEFAULT '' NOT NULL,
+  record_type   varchar(255) DEFAULT '' NOT NULL,
   headline      varchar(255) DEFAULT '' NOT NULL,
   field         varchar(255) DEFAULT '' NOT NULL,
   table_name    varchar(255) DEFAULT '' NOT NULL,
@@ -63,4 +67,8 @@ CREATE TABLE tx_linkvalidator_exclude_from_check (
   KEY domain (domain),
 
   PRIMARY KEY (uid)
+);
+
+CREATE TABLE pages (
+  donotchecklinks hidden tinyint(1) DEFAULT '0' NOT NULL
 );

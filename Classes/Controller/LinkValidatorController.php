@@ -30,6 +30,7 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
+use TYPO3\CMS\Linkvalidator\Utility\LinkReportUtility;
 use TYPO3Fluid\Fluid\View\ViewInterface;
 
 class LinkValidatorController
@@ -115,13 +116,13 @@ class LinkValidatorController
 
         $results = $this->LinkResultRepository->findAllResults();
 
-        // todo: simplify error result
         foreach ($results as $key =>$result) {
+            // todo: simplify error result, use only error code, get the rest from yaml config
             $result['errormessage'] = unserialize($result['url_response'])['errorParams']['message'];
-            if (strlen($result['headline']) > 50) {
-                $result['headline'] = substr($result['headline'], 0, 47) . '...';
-            }
+            $result['headline'] = LinkReportUtility::processElementHeader($result['headline']);
+            // todo: linkchecker should put path in database
             $result['path'] = BackendUtility::getRecordPath($result['record_pid'], '', 0,0);
+            $result['path'] = LinkReportUtility::processPath($result['path']);
             $results[$key] = $result;
         }
         $this->view->assign('results', $results);

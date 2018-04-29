@@ -43,6 +43,7 @@ class RecordActionViewHelper extends AbstractViewHelper
         $this->registerArgument('uid', 'int', 'UID of the Record', false);
         $this->registerArgument('pid', 'int', 'PID of the Record', false);
         $this->registerArgument('table', 'string', 'table', false);
+        $this->registerArgument('sys_language_uid', 'int', 'language', false);
     }
 
     /**
@@ -58,7 +59,6 @@ class RecordActionViewHelper extends AbstractViewHelper
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): string
     {
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-
         switch ($arguments['command']) {
             case 'edit':
                 $urlParameters = [
@@ -69,27 +69,23 @@ class RecordActionViewHelper extends AbstractViewHelper
                 return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
 
             case 'view':
+                $pageId = $arguments['pid'];
+                if ($arguments['table'] == 'pages') {
+                    $pageId = $arguments['uid'];
+                }
 
                 // TODO: ok, there is probably a better way to do this but I am not in an Extbase
                 // controller and the UriBuilder we're using here is for the Backend.
-                return GeneralUtility::getIndpEnv('TYPO3_SITE_URL')
-                    . 'index.php?id=' . $arguments['pid']
-                    . '#c' . $arguments['uid'];
-                /*
-                $urlParameters = [
-                    'article' = $arguments['uid'];
-                ];
-                return (string)$uriBuilder->reset()
-                    ->setTargetPageUid($arguments['pid'])
-                    ->build();
-                break;
-                */
+                $pageUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL')
+                    . 'index.php?id=' . $pageId;
+                if ($arguments['table'] == 'tt_content') {
+                    $pageUrl .= '#c' . $arguments['uid'];
+                }
+                return $pageUrl;
+
             default:
                 // todo get new exception id?
                 throw new \InvalidArgumentException('Invalid command given to RecordActionViewhelper.', 1516708789);
         }
-
-
-
     }
 }

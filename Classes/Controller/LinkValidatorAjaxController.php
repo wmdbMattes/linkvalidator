@@ -21,6 +21,8 @@ use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Linkvalidator\LinkChecker\LinkChecker;
 use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
 
 /**
@@ -29,25 +31,53 @@ use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
 class LinkValidatorAjaxController
 {
     /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
+     * @var LinkResultRepository
      */
-    public function listAction(ServerRequestInterface $request): ResponseInterface
+    protected $linkResultRepository;
+
+    /**
+     * Instantiate the form protection before a simulated user is initialized.
+     */
+    public function __construct()
     {
-        $page = $request->getQueryParams()['page'];
-        $repository = new LinkResultRepository();
-        #$results = $repository->getResults([], [], 0);
-        return new HtmlResponse('<h1>huhu</h1>');
+        $this->linkResultRepository = GeneralUtility::makeInstance(LinkResultRepository::class);
     }
 
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
+    public function listAction(ServerRequestInterface $request): ResponseInterface
+    {
+        $page = $request->getQueryParams()['page'];
+        $results = $this->linkResultRepository->findAllResults();
+        return new HtmlResponse('<h1>huhu</h1>');
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     * @throws \InvalidArgumentException
+     */
     public function scanAllAction(ServerRequestInterface $request): ResponseInterface
+    {
+
+        $linkChecker = GeneralUtility::makeInstance(LinkChecker::class);
+        $linkChecker->findBrokenLinks();
+
+        return new HtmlResponse('scan all ...');
+        //return new JsonResponse(['kommt noch']);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function scanIncrementalAction(ServerRequestInterface $request): ResponseInterface
     {
         return new JsonResponse(['kommt noch']);
     }
+
 
     /**
      * @param ServerRequestInterface $request

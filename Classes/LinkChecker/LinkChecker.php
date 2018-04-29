@@ -15,6 +15,10 @@ namespace TYPO3\CMS\Linkvalidator\LinkChecker;
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\Linkvalidator\LinkChecker\LinkAnalyzer;
+use TYPO3\CMS\Linkvalidator\Repository\ContentRepository;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class LinkChecker
 {
     /**
@@ -27,9 +31,21 @@ class LinkChecker
      */
     protected $linkResultRepository;
 
+    /**
+     * @var ContentRepository
+     */
+    protected $contentRepository;
+
+    /**
+     * @var LinkAnalyzer
+     */
+    protected $linkAnalyzer;
+
     public function __construct()
     {
-        $this->getLanguageService()->includeLLFile('EXT:linkvalidator/Resources/Private/Language/locallang_module_linkvalidator.xlf');
+        //$this->getLanguageService()->includeLLFile('EXT:linkvalidator/Resources/Private/Language/locallang_module_linkvalidator.xlf');
+        $this->contentRepository = GeneralUtility::makeInstance(ContentRepository::class);
+        $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
     }
 
     /**
@@ -50,33 +66,65 @@ class LinkChecker
      */
     public function flushBrokenLinks()
     {
-
+        $this->linkResultRepository->removeAll();
     }
 
     /**
      * Recheck for broken links using current $properties.
      * Stores in LinkResultRepository.
      * * Iterate through tables-> fields
-     * * use list of pids
+     * * use list of pids ?
      * * consider hooks
      *
      * @param int $startPage
      * @param int $
      *
      *
-     * @todo delete existing links
+     * @todo delete / update existing links
+     * @todo read configuration
      */
-    public function checkBrokenLinks(int $startPage, int depth=-1)
+    public function findBrokenLinks()
     {
-       $pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
-       $pages = $pagesRepository->getPagesRecursive($startPage, $depth, $properties->isInHiddenPages(), $properties->getPerms());
+        //$pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
+        //$pages = $pagesRepository->getPagesRecursive($startPage, $depth, $properties->isInHiddenPages(), $properties->getPerms());
 
+        // todo: read config
+        $this->searchFields = [
+            'tt_content' => 'bodytext',
+            //'pages'      => 'url'
+        ];
+        $analyzeResults = [];
 
+        // Traverse all configured tables and fields
+        foreach ($this->searchFields as $table => $field) {
+            // If table is not configured, assume the extension is not installed
+            // and therefore no need to check it
+            if (!is_array($GLOBALS['TCA'][$table])) {
+                continue;
+            }
 
+            $rows = $this->findContentForField($table, $field);
+
+            $fields = [$field];
+
+            foreach ($rows as $row) {
+                $this->linkAnalyzer->analyzeRecord($analyzeResults, $table, $fields, $row);
+            }
+        }
     }
+
+    protected function findContentForField($tablename, $field, $constraints = [])
+    {
+
+        $results = $this->contentRepository->findAllContent('tt_content', 'bodytext');
+        return $results;
+    }
+
 
     /**
      * Get list of pids to check.
+     *
+     * @deprecated
      */
     protected function getPidList()
     {

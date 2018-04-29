@@ -11,6 +11,9 @@
  * The TYPO3 project - inspiring people to share!
  */
 
+
+// original JavaScript of current linkvalidator - deprecated?
+
 /**
  * Module: TYPO3/CMS/Linkvalidator/Linkvalidator
  */

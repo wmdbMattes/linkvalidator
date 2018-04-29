@@ -85,7 +85,7 @@
 				<source>Listing of broken links</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.path">
-				<source>Path</source>
+				<source>Page path</source>
 			</trans-unit>
 			<trans-unit id="list.tableHead.element">
 				<source>Element title</source>
@@ -114,6 +114,10 @@
 			<trans-unit id="list.no.headline">
 				<source>no headline</source>
 			</trans-unit>
+			<!-- TODO: use list.report.error.* for all error messages (short form)
+			     MUST CHECK TRANSLATIONS AS WELL
+			-->
+			<!-- TODO: use list.report.error.detail.* for all error messages (long form) -->
 			<trans-unit id="list.report.pagedeleted">
 				<source>Page '###title###' (###uid###) is deleted.</source>
 			</trans-unit>
@@ -157,11 +161,14 @@
 				<source>A redirect loop occurred. (%s: %s)</source>
 			</trans-unit>
 			<trans-unit id="list.report.pageforbidden403">
-				<source>Accessing this address is not allowed (403).</source>
+				<source>Not allowed (403).</source>
 			</trans-unit>
 			<trans-unit id="list.report.pagenotfound404">
-				<source>The requested url was not found (404).</source>
+				<source>Not found (404).</source>
 			</trans-unit>
+			<trans-unit id="list.report.pagenotfound404.detail">
+                <source> The requested url was not found (404).</source>
+            </trans-unit>
 			<trans-unit id="list.report.externalerror">
 				<source>External Link returned HTTP error code (%s).</source>
 			</trans-unit>
@@ -169,8 +176,11 @@
 				<source>File doesn't exist.</source>
 			</trans-unit>
 			<trans-unit id="list.report.timeout">
-				<source>Operation timeout. The specified time-out period was reached according to the conditions.</source>
+				<source>Timeout</source>
 			</trans-unit>
+			<trans-unit id="list.report.timeout.detail">
+                <source>Operation timeout. The specified time-out period was reached according to the conditions.</source>
+            </trans-unit>
 			<trans-unit id="list.report.internalerror500">
 				<source>Internal Server Error (500)</source>
 			</trans-unit>
@@ -187,7 +197,7 @@
 				<source>Exception: %s</source>
 			</trans-unit>
 			<trans-unit id="list.report.networkexception">
-				<source>Network error / invalid domain</source>
+				<source>Network error or wrong domain</source>
 			</trans-unit>
 			<trans-unit id="list.msg.ok">
 				<source>Ok</source>

@@ -13,17 +13,13 @@
 
 import * as $ from 'jquery';
 
-
-/**
- * Module: TYPO3/CMS/Backend/Icons
- * Uses the icon API of the core to fetch icons via AJAX.
- */
 class LinkValidator {
 
     constructor() {
         $(
             (): void => {
                 $('.refresh').on('click', this.getList);
+                $('.scanall').on('click', this.scanAll);
             }
         );
     }
@@ -31,6 +27,16 @@ class LinkValidator {
     public getList(event: JQueryEventObject): void {
         $.ajax({
             url: TYPO3.settings.ajaxUrls.linkvalidator_listresults,
+            dataType: 'html',
+            success: (markup: string): void => {
+                $('#t3js-linkvalidator-ajaxresults').html(markup);
+            }
+        });
+    }
+
+    public scanAll(event: JQueryEventObject): void {
+        $.ajax({
+            url: TYPO3.settings.ajaxUrls.linkvalidator_scan_all,
             dataType: 'html',
             success: (markup: string): void => {
                 $('#t3js-linkvalidator-ajaxresults').html(markup);

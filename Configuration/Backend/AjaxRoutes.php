@@ -16,6 +16,10 @@ return [
         'path' => '/linkvalidator/scan/all',
         'target' => \TYPO3\CMS\Linkvalidator\Controller\LinkValidatorAjaxController::class . '::scanAllAction'
     ],
+    'linkvalidator_scan_incremental' => [
+        'path' => '/linkvalidator/scan/incremental',
+        'target' => \TYPO3\CMS\Linkvalidator\Controller\LinkValidatorAjaxController::class . '::scanIncrementalAction'
+    ],
     'linkvalidator_scan_single' => [
         'path' => '/linkvalidator/scan/single',
         'target' => \TYPO3\CMS\Linkvalidator\Controller\LinkValidatorAjaxController::class . '::scanSingleAction'
