@@ -35,14 +35,15 @@ class ContentRepository
      */
     public function findAllContent(string $table, string $field): array
     {
+        $defaultFields = [
+            'uid',
+            'pid',
+            $GLOBALS['TCA'][$table]['ctrl']['label'],
+        ];
+
         // Always add some fields to returned fields: uid, pid, ...
         $selectFields = array_merge(
-            [
-                'uid',
-                'pid',
-                $GLOBALS['TCA'][$table]['ctrl']['label'],
-                'sys_language_uid'
-            ],
+            $defaultFields,
             [$field]);
 
         // prepend 'table.' because of join with pages
@@ -50,9 +51,10 @@ class ContentRepository
             $value = $table . '.' . $value;
         });
 
-
-
-
+        // check if sys_language_uid exists
+        if ($GLOBALS['TCA'][$table]['columns']['sys_language_uid']) {
+            $selectFields[] = $table . '.' . 'sys_language_uid';
+        }
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
         $queryBuilder
@@ -65,6 +67,7 @@ class ContentRepository
                 $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier($table . '.pid'))
             );
 
+        // todo: read from config
         $considerHidden = true;
 
         if ($considerHidden) {
