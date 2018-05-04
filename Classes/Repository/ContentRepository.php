@@ -29,6 +29,8 @@ class ContentRepository
     /**
      * Returns array of content elements
      *
+     * @table Name of table: can be anything: tt_content, pages, ...
+     *
      * @throws InvalidArgumentException
      *
      * @todo handle pages table differently
@@ -47,27 +49,32 @@ class ContentRepository
             [$field]);
 
         // prepend 'table.' because of join with pages
-        array_walk($selectFields, function (&$value, $key) use(&$table) {
-            $value = $table . '.' . $value;
-        });
+        if ($table != 'pages') {
+            array_walk($selectFields, function (&$value, $key) use (&$table) {
+                $value = $table . '.' . $value;
+            });
+        }
 
-        // check if sys_language_uid exists
-        if ($GLOBALS['TCA'][$table]['columns']['sys_language_uid']) {
+        if (array_key_exists('sys_language_uid', $GLOBALS['TCA'][$table]['columns'] ?? [])) {
             $selectFields[] = $table . '.' . 'sys_language_uid';
         }
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
         $queryBuilder
             ->select(... $selectFields)
-            ->from($table)
-            ->join(
-                $table,
-                'pages',
-                'pages',
-                $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier($table . '.pid'))
-            );
+            ->from($table);
+        if ($table != 'pages') {
+            $queryBuilder
+                ->join(
+                    $table,
+                    'pages',
+                    'pages',
+                    $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier($table . '.pid'))
+                );
+        }
 
         // todo: read from config
+
         $considerHidden = true;
 
         if ($considerHidden) {
@@ -75,10 +82,11 @@ class ContentRepository
                 ->removeAll()
                 ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
         }
-
-        $queryBuilder->expr()->isNotNull($table . '.' . $field);
-
-
+        $fullFieldName = $field;
+        if ($table != 'pages') {
+            $fullFieldName = $table . '.' . $field;
+        }
+        $queryBuilder->expr()->isNotNull($fullFieldName);
         $results = $queryBuilder
             ->execute()
             ->fetchAll();

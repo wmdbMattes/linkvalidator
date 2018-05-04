@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Repository for broken links.
  */
-class LinkResultRepository
+class BrokenLinkRepository
 {
     /** @var TYPO3\CMS\Core\Database\Query\QueryBuilder */
     protected $queryBuilder;
@@ -55,6 +55,13 @@ class LinkResultRepository
     {
         $this->queryBuilder->delete('tx_linkvalidator_link')
             ->execute();
+    }
+
+    public function insertRecord(array $record)
+    {
+        GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tx_linkvalidator_link')
+            ->insert('tx_linkvalidator_link', $record);
     }
 
     /**

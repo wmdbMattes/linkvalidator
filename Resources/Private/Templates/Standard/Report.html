@@ -1,7 +1,5 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:lv="http://typo3.org/ns/TYPO3/CMS/Linkvalidator/ViewHelpers" data-namespace-typo3-fluid="true">
 
-<f:debug title="results">{results}</f:debug>
-
 <f:comment>
     ---------- DISABLED -----------
     DRAFT 1
@@ -68,7 +66,11 @@
             <thead>
             <tr>
                 <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.element"/></th>
-                <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.path"/></th>
+
+                <f:comment>
+                    path
+                    <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.path"/></th>
+                </f:comment>
                 <f:comment>
                     <th><f:translate key="LLL:EXT:linkvalidator/Resources/Private/Language/Module/locallang.xlf:list.tableHead.headlink"/></th>
                 </f:comment>
@@ -82,16 +84,16 @@
             <f:for each="{results}" as="result">
                 <tr>
                     <td>
-                        <a href="{lv:recordAction(command: 'edit', uid: result.record_uid, pid: result.record_pid, table: result.table_name)}"
-                           title="{f:translate(key: 'LLL:EXT:lang/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
-                            <core:icon identifier="mimetypes-x-content-text-picture" />
-                            <f:comment>
-                                <core:icon identifier="mimetypes-other-other" />
-                            </f:comment>
-                            {result.headline}
-                        </a>
+                        <core:icon identifier="mimetypes-x-content-text-picture" />
+                        <f:comment>
+                            <core:icon identifier="mimetypes-other-other" />
+                        </f:comment>
+                        {result.headline} (lang={result.record_sys_language_uid})
                     </td>
-                    <td>{result.path}</td>
+                    <f:comment>
+                        path
+                        <td>{result.path}</td>
+                    </f:comment>
                     <td>
                         <core:icon identifier="overlay-external-link" />
                         <a href="{result.url}" target="_blank">{result.link_title}</a>:
@@ -105,9 +107,12 @@
                     <td><f:format.date format="d.m.Y h:m">{result.last_check}</f:format.date></td>
                     <f:comment>todo: add action buttons, see viewhelper in redirects + https://review.typo3.org/c/55838/</f:comment>
                     <td>
-                        <div class="btn-group">
+                        <a class="btn-group">
                             <f:comment>Add language for page</f:comment>
-                            <f:link.external class="btn btn-default" uri="{lv:recordAction(command: 'view', uid: result.record_uid, pid: result.record_pid, table: result.table_name)}" target="_blank">
+                            <f:link.external
+                                    class="btn btn-default"
+                                    uri="{lv:recordAction(command: 'view', uid: result.record_uid, pid: result.record_pid, table: result.table_name, sys_language_uid: result.record_sys_language_uid)}"
+                                    target="_blank">
                                 <core:icon identifier="actions-view-page" />
                             </f:link.external>
 
@@ -122,7 +127,8 @@
                                 </f:link.external>
                             </f:comment>
                             <a class="btn btn-default"
-                               href="{lv:recordAction(command: 'edit', uid: result.record_uid, pid: result.record_pid, table: result.table_name)}"
+                               onclick="$().ready(function() {alert('loaded');});"
+                               href="{lv:recordAction(command: 'edit', uid: result.record_uid, pid: result.record_pid, table: result.table_name, field: result.field)}"
                                title="{f:translate(key: 'LLL:EXT:lang/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
                                 <core:icon identifier="actions-open" />
                             </a>
@@ -132,6 +138,12 @@
                                href=""
                                title="Recheck link">
                                 <core:icon identifier="actions-synchronize" />
+                            </a>
+                            <a class="btn btn-default"
+                               href="{lv:recordAction(command: 'editlink', uid: result.record_uid, pid: result.record_pid, table: result.table_name, field: result.field)}"
+                               title="Edit Link"
+                                >
+                                <core:icon identifier="overlay-external-link" />
                             </a>
                         </div>
                     </td>

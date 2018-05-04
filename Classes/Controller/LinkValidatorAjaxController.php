@@ -22,8 +22,8 @@ use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Linkvalidator\LinkChecker\LinkChecker;
-use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
+use TYPO3\CMS\Linkvalidator\Controller\LinkCheckerController;
+use TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository;
 
 /**
  * Main script class for rendering of the folder tree
@@ -31,16 +31,16 @@ use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
 class LinkValidatorAjaxController
 {
     /**
-     * @var LinkResultRepository
+     * @var BrokenLinkRepository
      */
-    protected $linkResultRepository;
+    protected $brokenLinkRepository;
 
     /**
      * Instantiate the form protection before a simulated user is initialized.
      */
     public function __construct()
     {
-        $this->linkResultRepository = GeneralUtility::makeInstance(LinkResultRepository::class);
+        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
     }
 
     /**
@@ -50,7 +50,7 @@ class LinkValidatorAjaxController
     public function listAction(ServerRequestInterface $request): ResponseInterface
     {
         $page = $request->getQueryParams()['page'];
-        $results = $this->linkResultRepository->findAllResults();
+        $results = $this->brokenLinkRepository->findAllResults();
         return new HtmlResponse('<h1>huhu</h1>');
     }
 
@@ -62,7 +62,7 @@ class LinkValidatorAjaxController
     public function scanAllAction(ServerRequestInterface $request): ResponseInterface
     {
 
-        $linkChecker = GeneralUtility::makeInstance(LinkChecker::class);
+        $linkChecker = GeneralUtility::makeInstance(LinkCheckerController::class);
         $linkChecker->findBrokenLinks();
 
         return new HtmlResponse('scan all ...');

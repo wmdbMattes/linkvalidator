@@ -43,6 +43,7 @@ class RecordActionViewHelper extends AbstractViewHelper
         $this->registerArgument('uid', 'int', 'UID of the Record', false);
         $this->registerArgument('pid', 'int', 'PID of the Record', false);
         $this->registerArgument('table', 'string', 'table', false);
+        $this->registerArgument('field', 'string', 'field', false);
         $this->registerArgument('sys_language_uid', 'int', 'language', false);
     }
 
@@ -59,13 +60,53 @@ class RecordActionViewHelper extends AbstractViewHelper
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): string
     {
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        switch ($arguments['command']) {
+        extract($arguments, 0);
+
+        switch ($command) {
             case 'edit':
                 $urlParameters = [
-                    'edit[' . $arguments['table'] . '][' . $arguments['uid'] . ']' => 'edit',
-                    'returnUrl' => (string)$uriBuilder->buildUriFromRoute('site_linkvalidator'),
+                    //'edit[' . $table . '][' . $uid . ']' => 'edit',
+                    // see https://docs.typo3.org/typo3cms/CoreApiReference/ApiOverview/Examples/EditLinks/Index.html#editing-only-a-few-fields-from-a-record
+                    'edit[' . $table . '][' . $uid . ']' => 'edit',
+                    'columnsOnly'                        => $field,
+                    'returnUrl'                          => (string)$uriBuilder->buildUriFromRoute('site_linkvalidator'),
+  /*                  'curUrl' => [
+                        'url'       => 'http://www.linkedin.com/groups?gid=70999',
+                        'target'    => '_blank',
+                        'title'     => 'Link to LinkedIn'
+                    ],
+  */
                 ];
                 $route = 'record_edit';
+                return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
+
+            /**
+             * Open Link Wizard. This does not work, because link
+             * wizard must be opened from rte, otherwise RteLinkBrowser.js
+             * finalizeFunction fails on
+             * RteLinkBrowser.CKEditor.document
+             *
+             * todo: either remove this or find another way
+             */
+            case 'editlink':
+                $parameters = [
+                    'table'     => $table,
+                    'fieldName' => $field,
+                    'pid'       => $pid,
+                    'uid'       => $uid,
+                    'recordType' => ''
+                ];
+                $urlParameters = [
+                    'contentsLanguage' => 'en',
+                    // 'route'
+                    // 'token*
+                    'P' => $parameters,
+                    'curUrl' => [
+                        'url' => 'http://abc.de'
+                    ],
+                    'editorId' => 'cke_1'
+                ];
+                $route = 'rteckeditor_wizard_browse_links';
                 return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
 
             case 'view':
@@ -78,6 +119,9 @@ class RecordActionViewHelper extends AbstractViewHelper
                 // controller and the UriBuilder we're using here is for the Backend.
                 $pageUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL')
                     . 'index.php?id=' . $pageId;
+                if ($arguments['sys_language_uid'] ?? false) {
+                    $pageUrl .= '&L=' . $arguments['sys_language_uid'];
+                }
                 if ($arguments['table'] == 'tt_content') {
                     $pageUrl .= '#c' . $arguments['uid'];
                 }

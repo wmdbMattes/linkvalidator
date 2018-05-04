@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace TYPO3\CMS\Linkvalidator\LinkChecker;
+namespace TYPO3\CMS\Linkvalidator\Controller;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -17,9 +17,13 @@ namespace TYPO3\CMS\Linkvalidator\LinkChecker;
 
 use TYPO3\CMS\Linkvalidator\LinkChecker\LinkAnalyzer;
 use TYPO3\CMS\Linkvalidator\Repository\ContentRepository;
+use TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LinkChecker
+/**
+ * This class does the main link checking.
+ */
+class LinkCheckerController
 {
     /**
      * @var LinkCheckProperties
@@ -27,9 +31,9 @@ class LinkChecker
     protected $properties;
 
     /**
-     * @var LinkResultRepository
+     * @var BrokenLinkRepository
      */
-    protected $linkResultRepository;
+    protected $brokenLinkRepository;
 
     /**
      * @var ContentRepository
@@ -46,6 +50,7 @@ class LinkChecker
         //$this->getLanguageService()->includeLLFile('EXT:linkvalidator/Resources/Private/Language/locallang_module_linkvalidator.xlf');
         $this->contentRepository = GeneralUtility::makeInstance(ContentRepository::class);
         $this->linkAnalyzer = GeneralUtility::makeInstance(LinkAnalyzer::class);
+        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
     }
 
     /**
@@ -66,12 +71,12 @@ class LinkChecker
      */
     public function flushBrokenLinks()
     {
-        $this->linkResultRepository->removeAll();
+        $this->brokenLinkRepository->removeAll();
     }
 
     /**
      * Recheck for broken links using current $properties.
-     * Stores in LinkResultRepository.
+     * Stores in BrokenLinkRepository.
      * * Iterate through tables-> fields
      * * use list of pids ?
      * * consider hooks
@@ -81,11 +86,14 @@ class LinkChecker
      *
      *
      * @todo delete / update existing links
+     * @todo write start / stop scan to DB (LinkCheckRepository)
      * @todo read configuration
      */
     public function findBrokenLinks()
     {
-        //$pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
+        $this->brokenLinkRepository->removeAll();
+
+        //$pageRepository = GeneralUtility::makeInstance(PageRepository::class);
         //$pages = $pagesRepository->getPagesRecursive($startPage, $depth, $properties->isInHiddenPages(), $properties->getPerms());
 
         // todo: read config
@@ -93,7 +101,6 @@ class LinkChecker
             'tt_content' => 'bodytext',
             //'pages'      => 'url'
         ];
-        $analyzeResults = [];
 
         // Traverse all configured tables and fields
         foreach ($this->searchFields as $table => $field) {
@@ -103,23 +110,25 @@ class LinkChecker
                 continue;
             }
 
-            $rows = $this->findContentForField($table, $field);
+            $rows = $this->contentRepository->findAllContent('tt_content', 'bodytext');
 
             $fields = [$field];
 
             foreach ($rows as $row) {
-                $this->linkAnalyzer->analyzeRecord($analyzeResults, $table, $fields, $row);
+                $links = [];
+                $this->linkAnalyzer->findAllSupportedLinksForRecord($links, $table, $fields, $row);
+
+                $brokenLinkResults = $this->linkAnalyzer->checkLinks($links);
+
+                foreach ($brokenLinkResults as $brokenLink) {
+                    //var_dump($brokenLink);
+                    $this->brokenLinkRepository->insertRecord($brokenLink);
+                }
             }
+
+
         }
     }
-
-    protected function findContentForField($tablename, $field, $constraints = [])
-    {
-
-        $results = $this->contentRepository->findAllContent('tt_content', 'bodytext');
-        return $results;
-    }
-
 
     /**
      * Get list of pids to check.

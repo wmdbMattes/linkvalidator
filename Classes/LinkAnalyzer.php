@@ -260,6 +260,10 @@ class LinkAnalyzer
      * @param array $fields Array of fields to analyze
      * @param array $record Record to analyse
      */
+
+    // moved to Classes/LinkChecker
+
+    /*
     public function analyzeRecord(array &$results, $table, array $fields, array $record)
     {
         list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
@@ -267,6 +271,7 @@ class LinkAnalyzer
         // Put together content of all relevant fields
         $haystack = '';
         /** @var $htmlParser HtmlParser */
+        /*
         $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
         $idRecord = $record['uid'];
         // Get all references
@@ -282,6 +287,7 @@ class LinkAnalyzer
                     // Traverse soft references
                     foreach ($softRefs as $spKey => $spParams) {
                         /** @var $softRefObj \TYPO3\CMS\Core\Database\SoftReferenceIndex */
+        /*
                         $softRefObj = BackendUtility::softRefParserObj($spKey);
                         // If there is an object returned...
                         if (is_object($softRefObj)) {
@@ -300,6 +306,7 @@ class LinkAnalyzer
             }
         }
     }
+        */
 
     /**
      * Returns the TSConfig that was passed to the init() method.

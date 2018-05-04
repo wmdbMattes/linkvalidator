@@ -2,6 +2,7 @@
 defined('TYPO3_MODE') or die();
 
 // Add module
+// deprecated
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
     'web_info',
     \TYPO3\CMS\Linkvalidator\Report\LinkValidatorReport::class,
@@ -21,7 +22,7 @@ defined('TYPO3_MODE') or die();
     '',
     '',
     [
-        'routeTarget' => \TYPO3\CMS\Linkvalidator\Controller\LinkValidatorController::class . '::handleRequest',
+        'routeTarget' => \TYPO3\CMS\Linkvalidator\Controller\LinkValidatorReportController::class . '::handleRequest',
         'access' => 'group,user',
         'name' => 'site_linkvalidator',
         'icon' => 'EXT:linkvalidator/Resources/Public/Icons/Extension.svg',

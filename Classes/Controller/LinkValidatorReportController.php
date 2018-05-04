@@ -29,11 +29,11 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-use TYPO3\CMS\Linkvalidator\Repository\LinkResultRepository;
+use TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository;
 use TYPO3\CMS\Linkvalidator\Utility\LinkReportUtility;
 use TYPO3Fluid\Fluid\View\ViewInterface;
 
-class LinkValidatorController
+class LinkValidatorReportController
 {
     /**
      * ModuleTemplate object
@@ -58,9 +58,9 @@ class LinkValidatorController
     protected $iconFactory;
 
     /**
-     * @var LinkResultRepository
+     * @var BrokenLinkRepository
      */
-    protected $LinkResultRepository;
+    protected $brokenLinkRepository;
 
     /**
      * Instantiate the form protection before a simulated user is initialized.
@@ -68,7 +68,7 @@ class LinkValidatorController
     public function __construct()
     {
         $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->LinkResultRepository = GeneralUtility::makeInstance(LinkResultRepository::class);
+        $this->brokenLinkRepository = GeneralUtility::makeInstance(BrokenLinkRepository::class);
         $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/Modal');
         $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Linkvalidator/LinkValidator');
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
@@ -114,7 +114,7 @@ class LinkValidatorController
         $this->view->setPartialRootPaths(['EXT:linkvalidator/Resources/Private/Partials']);
         $this->view->setLayoutRootPaths(['EXT:linkvalidator/Resources/Private/Layouts']);
 
-        $results = $this->LinkResultRepository->findAllResults();
+        $results = $this->brokenLinkRepository->findAllResults();
 
         foreach ($results as $key =>$result) {
             // todo: simplify error result, use only error code, get the rest from yaml config

@@ -24,7 +24,8 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * This class provides Processing plugin implementation
+ * This class does link operations. It does not access the DB or
+ * make changes in any way.
  */
 class LinkAnalyzer
 {
@@ -123,6 +124,85 @@ class LinkAnalyzer
         $this->searchFields = $searchField;
         $this->pids = GeneralUtility::intExplode(',', $pidList, true);
         $this->tsConfig = $tsConfig;
+    }
+
+    /**
+     * todo: should showalllinks still be supported?
+     *
+     * @param array $links
+     */
+    public function checkLinks(array $links)
+    {
+
+        $brokenLinkResults = [];
+
+        foreach ($this->hookObjectsArr as $key => $hookObj) {
+            if (is_array($links[$key]) && empty($checkOptions) || is_array($results[$key]) && $checkOptions[$key]) {
+                //  Check them
+                foreach ($links[$key] as $entryKey => $entryValue) {
+                    $table = $entryValue['table'];
+                    $record = [];
+                    $record['headline'] = BackendUtility::getRecordTitle($table, $entryValue['row']);
+                    $record['record_pid'] = $entryValue['row']['pid'];
+                    $record['record_uid'] = $entryValue['uid'];
+                    $record['record_sys_language_uid'] = $entryValue['row']['sys_language_uid'];
+                    $record['table_name'] = $table;
+                    $record['link_title'] = $entryValue['link_title'];
+                    $record['field'] = $entryValue['field'];
+                    $record['last_check'] = time();
+                    $this->recordReference = $entryValue['substr']['recordRef'];
+                    $this->pageWithAnchor = $entryValue['pageAndAnchor'];
+                    if (!empty($this->pageWithAnchor)) {
+                        // Page with anchor, e.g. 18#1580
+                        $url = $this->pageWithAnchor;
+                    } else {
+                        $url = $entryValue['substr']['tokenValue'];
+                    }
+
+                    // todo: is this used anywhere?
+                    $this->linkCounts[$table]++;
+
+                    // todo: check exclude url list
+
+                    $checkUrl = $hookObj->checkLink($url, $entryValue, $this);
+                    // Broken link found
+                    if (!$checkUrl) {
+                        $response = [];
+                        $response['valid'] = false;
+                        $response['errorParams'] = $hookObj->getErrorParams();
+                        $this->brokenLinkCounts[$table]++;
+                        $record['link_type'] = $key;
+                        $record['url'] = $url;
+                        $record['url_response'] = serialize($response);
+
+                        $brokenLinkResults[] = $record;
+
+                        /*
+                        GeneralUtility::makeInstance(ConnectionPool::class)
+                            ->getConnectionForTable('tx_linkvalidator_link')
+                            ->insert('tx_linkvalidator_link', $record);
+                        */
+                    } elseif (GeneralUtility::_GP('showalllinks')) {
+                        $response = [];
+                        $response['valid'] = true;
+                        $this->brokenLinkCounts[$table]++;
+                        $record['url'] = $url;
+                        $record['link_type'] = $key;
+                        $record['url_response'] = serialize($response);
+
+                        $brokenLinkResults[] = $record;
+
+                        /*
+                        GeneralUtility::makeInstance(ConnectionPool::class)
+                            ->getConnectionForTable('tx_linkvalidator_link')
+                            ->insert('tx_linkvalidator_link', $record);
+                        */
+                    }
+                }
+            }
+        }
+
+        return $brokenLinkResults;
     }
 
     /**
@@ -255,14 +335,16 @@ class LinkAnalyzer
     */
 
     /**
-     * Find all supported broken links for a specific record
+     * Find all supported links for a specific record
+     *
+     * was: analyzeRecord
      *
      * @param array $results Array of broken links
      * @param string $table Table name of the record
      * @param array $fields Array of fields to analyze
      * @param array $record Record to analyse
      */
-    public function analyzeRecord(array &$results, $table, array $fields, array $record)
+    public function findAllSupportedLinksForRecord(array &$results, $table, array $fields, array $record)
     {
         list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
 

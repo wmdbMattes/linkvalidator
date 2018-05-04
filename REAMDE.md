@@ -51,7 +51,8 @@ Possible chnages:
 
 Rewrite:
 - Use Fluid instead of marker template
-- Database access in Repository
+- Change class structure, break up functions
+- Database access only in Repository
 - 
 
 General changes
@@ -59,20 +60,23 @@ General changes
   not page / user / group TSconfig
 - Some things that were set for "Link Check" will now only
   be selectable for "Link Report" (if at all) : perms, showhidden
-- The link check is always done the same: entire site
+- The link check is always done the same: entire site. Linkcheck 
+  is not dependant on permissions of user, the report is.
+  This means it is not necessary to recheck for each person
 - The link check should be done via scheduler : show appropriate
   hints 
 - provide wizards which already suggest sensible defaults 
   (e.g. for scheduler)  
 
-GUI
+GUI: General
 - Module now under Site Management (not in Info module)
 - Icon for Module
+
+GUI: List of broken links
 - Reduce width of some columns, e.g. merge anchor and url into 
   1 column, truncate some strings
-
-List of broken links:
 - Add icons for view page, refresh
+- Edit icon: only show field with broken links
 
 ## Incoming ideas
 

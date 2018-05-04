@@ -26,8 +26,8 @@ class LinkReportUtility
      */
     public static function processElementHeader(string $header) : string
     {
-        if (mb_strlen($header) > 40) {
-            return substr($header, 0, 37) . '...';
+        if (mb_strlen($header) > 35) {
+            return substr($header, 0, 32) . '...';
         }
         return $header;
     }

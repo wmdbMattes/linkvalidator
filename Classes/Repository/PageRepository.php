@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException;
 
-class PagesRepository
+class PageRepository
 {
 
     /**
@@ -152,6 +152,23 @@ class PagesRepository
     }
 
     /**
+     * This function is in lieu of getRootLineIsHidden
+     * and takes care of getting the following info
+     * from the rootline:
+     *
+     * - path (consisting of all titles of parent page
+     *   up to a root page.
+     * - sitename (which is root page: next page with
+     *   is_siteroot
+     * - sitepid (root page pid)
+     * - is in hidden tree : some page
+     */
+    public function getRootlineInfo()
+    {
+
+    }
+
+    /**
      * Check if rootline contains a hidden page
      *
      * @param array $pageInfo Array with uid, title, hidden, extendToSubpages from pages table
@@ -160,6 +177,8 @@ class PagesRepository
      * @todo Does this really make sense here? Instead of checking if page in
      * rootline is hidden, we should not traverse into hidden page subtrees
      * in the first place if checkHidden is false!
+     *
+     * @deprecated
      */
     public function getRootLineIsHidden(array $pageInfo)
     {

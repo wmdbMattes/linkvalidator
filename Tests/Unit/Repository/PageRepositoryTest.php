@@ -24,7 +24,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\QueryRestrictionContainerInterface
 use TYPO3\CMS\Linkvalidator\Repository\PagesRepository;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class PagesRepositoryTest extends UnitTestCase
+class PageRepositoryTest extends UnitTestCase
 {
 
     /**
@@ -54,9 +54,9 @@ class PagesRepositoryTest extends UnitTestCase
         $statementProphecy->fetchAll()->willReturn($payload);
         $queryBuilderProphecy->execute()->willReturn($statementProphecy->reveal());
         $expressionBuilderProphecy->eq(Argument::cetera())->willReturn('');
-        $pagesRepository = GeneralUtility::makeInstance(PagesRepository::class);
-        $pagesRepository->setQueryBuilder($queryBuilderProphecy->reveal());
-        $result = $pagesRepository->getPagesRecursive(0, $depth, false, 1);
+        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
+        $pageRepository->setQueryBuilder($queryBuilderProphecy->reveal());
+        $result = $pageRepository->getPagesRecursive(0, $depth, false, 1);
         $this->assertSame($result, $expectedResult);
     }
 
