@@ -26,6 +26,7 @@ class LinkValidator {
 
     public getList(event: JQueryEventObject): void {
         $.ajax({
+            // defined in Configuration/Backend/AjaxRoutes.php
             url: TYPO3.settings.ajaxUrls.linkvalidator_listresults,
             dataType: 'html',
             success: (markup: string): void => {

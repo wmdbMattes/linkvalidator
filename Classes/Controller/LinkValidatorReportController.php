@@ -30,6 +30,7 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Linkvalidator\Repository\BrokenLinkRepository;
+use TYPO3\CMS\Linkvalidator\Utility\PaginationUtility;
 use TYPO3\CMS\Linkvalidator\Utility\LinkReportUtility;
 use TYPO3Fluid\Fluid\View\ViewInterface;
 
@@ -42,25 +43,23 @@ class LinkValidatorReportController
      */
     protected $moduleTemplate;
 
-    /**
-     * @var ViewInterface
-     */
+    /** @var ViewInterface  */
     protected $view;
 
-    /**
-     * @var ServerRequestInterface
-     */
+    /** @var ServerRequestInterface */
     protected $request;
 
-    /**
-     * @var IconFactory
-     */
+    /** * @var IconFactory */
     protected $iconFactory;
 
-    /**
-     * @var BrokenLinkRepository
-     */
+    /** @var BrokenLinkRepository  */
     protected $brokenLinkRepository;
+
+    /** @var int */
+    protected $numberOfLinksPerPage = 10;
+
+    /** @var int */
+    protected $currentPage = 0;
 
     /**
      * Instantiate the form protection before a simulated user is initialized.
@@ -95,9 +94,6 @@ class LinkValidatorReportController
         return new HtmlResponse($this->moduleTemplate->renderContent());
     }
 
-    /**
-     * Show all redirects, and add a button to create a new redirect
-     */
     protected function reportAction()
     {
     }
@@ -114,7 +110,8 @@ class LinkValidatorReportController
         $this->view->setPartialRootPaths(['EXT:linkvalidator/Resources/Private/Partials']);
         $this->view->setLayoutRootPaths(['EXT:linkvalidator/Resources/Private/Layouts']);
 
-        $results = $this->brokenLinkRepository->findAllResults();
+
+        $results = $this->brokenLinkRepository->findResultsForCurrentBeUser($this->currentPage, $this->numberOfLinksPerPage);
 
         foreach ($results as $key =>$result) {
             // todo: simplify error result, use only error code, get the rest from yaml config
@@ -125,8 +122,14 @@ class LinkValidatorReportController
             $result['path'] = LinkReportUtility::processPath($result['path']);
             $results[$key] = $result;
         }
+        $totalCount = $this->brokenLinkRepository->countResults();
+        $countResults = count($results);
+
         $this->view->assign('results', $results);
-        $this->view->assign('totalCount', count($results));
+        $this->view->assign('showCount', $countResults);
+        $this->view->assign('totalCount', $totalCount);
+        $this->view->assign('nextPage', PaginationUtility::getNextPage($totalCount, $this->currentPage, $this->numberOfLinksPerPage));
+        $this->view->assign('previousPage', PaginationUtility::getPreviousPage($this->currentPage));
 
     }
 

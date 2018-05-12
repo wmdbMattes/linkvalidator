@@ -65,7 +65,7 @@ class LinkValidatorAjaxController
         $linkChecker = GeneralUtility::makeInstance(LinkCheckerController::class);
         $linkChecker->findBrokenLinks();
 
-        return new HtmlResponse('scan all ...');
+        return new HtmlResponse('scan done ...');
         //return new JsonResponse(['kommt noch']);
     }
 

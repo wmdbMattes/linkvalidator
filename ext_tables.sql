@@ -20,8 +20,6 @@
 # - record_type : e.g. textmedia (for tt_content + ctype='textmedia'), plugin (for ctype='list')
 # - record_sitename
 #
-# TODO: fields for permissions
-
 
 CREATE TABLE tx_linkvalidator_link (
   uid                       int(11) NOT NULL auto_increment,

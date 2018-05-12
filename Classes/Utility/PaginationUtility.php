@@ -17,11 +17,44 @@ namespace TYPO3\CMS\Linkvalidator\Utility;
 
 class PaginationUtility
 {
+
+    /**
+     * Get number of next page
+     *
+     * @param $totalCount
+     * @param $currentPage
+     * @param $numberOfLinksPerPage
+     * @return int -1 if no nextPage
+     */
+    public static function getNextPage($totalCount, $currentPage, $numberOfLinksPerPage) : int
+    {
+
+        $nextPage = $currentPage + 1;
+        if (($nextPage * $numberOfLinksPerPage) > $totalCount) {
+            return -1;
+        }
+        return $nextPage;
+    }
+
+    /**
+     * Get number of previous page
+     *
+     * @param $currentPage
+     * @return int -1 if no previous page
+     */
+    public static function getPreviousPage($currentPage) : int
+    {
+        return $currentPage - 1;
+    }
+
+
     /**
      * @param int $totalHits
      * @param int $currentPage
      * @param int $perPage
      * @return array
+     *
+     * @deprecated
      */
     public static function getPages(int $totalHits, int $currentPage = 0, int $perPage = 10) : array
     {

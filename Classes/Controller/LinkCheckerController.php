@@ -83,13 +83,13 @@ class LinkCheckerController
      *
      * @param int $startPage
      * @param int $
-     *
+     * @return int number of broken links
      *
      * @todo delete / update existing links
      * @todo write start / stop scan to DB (LinkCheckRepository)
      * @todo read configuration
      */
-    public function findBrokenLinks()
+    public function findBrokenLinks() : int
     {
         $this->brokenLinkRepository->removeAll();
 
@@ -125,9 +125,9 @@ class LinkCheckerController
                     $this->brokenLinkRepository->insertRecord($brokenLink);
                 }
             }
-
-
         }
+        $this->brokenLinkRepository->countResultsForCurrentBeUser();
+
     }
 
     /**

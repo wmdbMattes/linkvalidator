@@ -88,6 +88,7 @@ class RecordActionViewHelper extends AbstractViewHelper
              *
              * todo: either remove this or find another way
              */
+            /*
             case 'editlink':
                 $parameters = [
                     'table'     => $table,
@@ -108,6 +109,35 @@ class RecordActionViewHelper extends AbstractViewHelper
                 ];
                 $route = 'rteckeditor_wizard_browse_links';
                 return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
+            */
+
+            case 'editlink':
+                $parameters = [
+                    'table'     => $table,
+                    'fieldName' => $field,
+                    'pid'       => $pid,
+                    'uid'       => $uid,
+                    'recordType' => ''
+                ];
+                $urlParameters = [
+                    'contentsLanguage' => 'en',
+                    // 'route'
+                    // 'token*
+                    'P' => $parameters,
+                    'curUrl' => [
+                        'url' => 'http://abc.de'
+                    ],
+                    'linkAttributes' => [
+                        'target' => 'http://abcsfsf.de',
+                        'title'  => '',
+                        'class'  => '',
+                        'params' => ''
+                    ],
+                    'editorId' => 'cke_1'
+                ];
+                $route = 'wizard_link';
+                return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
+
 
             case 'view':
                 $pageId = $arguments['pid'];
@@ -132,4 +162,67 @@ class RecordActionViewHelper extends AbstractViewHelper
                 throw new \InvalidArgumentException('Invalid command given to RecordActionViewhelper.', 1516708789);
         }
     }
+
+    public static function experimentalLinkWizard(): array
+    {
+        $options = $this->data['renderData']['fieldControlOptions'];
+
+        $title = $options['title'] ?? 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.link';
+
+        $parameterArray = $this->data['parameterArray'];
+        $itemName = $parameterArray['itemFormElName'];
+        $windowOpenParameters = $options['windowOpenParameters'] ?? 'height=800,width=1000,status=0,menubar=0,scrollbars=1';
+
+        $linkBrowserArguments = [];
+        if (isset($options['blindLinkOptions'])) {
+            $linkBrowserArguments['blindLinkOptions'] = $options['blindLinkOptions'];
+        }
+        if (isset($options['blindLinkFields'])) {
+            $linkBrowserArguments['blindLinkFields'] = $options['blindLinkFields'];
+        }
+        if (isset($options['allowedExtensions'])) {
+            $linkBrowserArguments['allowedExtensions'] = $options['allowedExtensions'];
+        }
+        $urlParameters = [
+            'P' => [
+                'params' => $linkBrowserArguments,
+                'table' => $this->data['tableName'],
+                'uid' => $this->data['databaseRow']['uid'],
+                'pid' => $this->data['databaseRow']['pid'],
+                'field' => $this->data['fieldName'],
+                'formName' => 'editform',
+                'itemName' => $itemName,
+                'hmac' => GeneralUtility::hmac('editform' . $itemName, 'wizard_js'),
+                'fieldChangeFunc' => $parameterArray['fieldChangeFunc'],
+                'fieldChangeFuncHash' => GeneralUtility::hmac(serialize($parameterArray['fieldChangeFunc'])),
+            ],
+        ];
+        /** @var \TYPO3\CMS\Backend\Routing\UriBuilder $uriBuilder */
+        $uriBuilder = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Routing\UriBuilder::class);
+        $url = (string)$uriBuilder->buildUriFromRoute('wizard_link', $urlParameters);
+        $onClick = [];
+        $onClick[] = 'this.blur();';
+        $onClick[] = 'vHWin=window.open(';
+        $onClick[] =    GeneralUtility::quoteJSvalue($url);
+        $onClick[] =    '+\'&P[currentValue]=\'+TBE_EDITOR.rawurlencode(';
+        $onClick[] =        'document.editform[' . GeneralUtility::quoteJSvalue($itemName) . '].value,300';
+        $onClick[] =    ')';
+        $onClick[] =    '+\'&P[currentSelectedValues]=\'+TBE_EDITOR.curSelected(';
+        $onClick[] =        GeneralUtility::quoteJSvalue($itemName);
+        $onClick[] =    '),';
+        $onClick[] =    '\'\',';
+        $onClick[] =    GeneralUtility::quoteJSvalue($windowOpenParameters);
+        $onClick[] = ');';
+        $onClick[] = 'vHWin.focus();';
+        $onClick[] = 'return false;';
+
+        return [
+            'iconIdentifier' => 'actions-wizard-link',
+            'title' => $title,
+            'linkAttributes' => [
+                'onClick' => implode('', $onClick),
+            ],
+        ];
+    }
+
 }

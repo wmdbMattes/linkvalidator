@@ -1,13 +1,67 @@
-# linkvalidator
+
 Development Fork of TYPO3s sysext LinkValidator
 
 This readme is used as scratchpad for this development version.
 
 Will be removed for final core version
 
-## Description of current functionality (before rewrite)
 
-### Link checking
+# Changes:
+
+Rewrite:
+- Use Fluid instead of marker template
+- Change class structure, break up functions
+- Database access only in Repository
+- 
+
+General changes
+- There is only 1 configuration per site for "Check Links",
+  not page / user / group TSconfig
+- Some things that were set for "Link Check" will now only
+  be selectable for "Link Report" : perms, showhidden
+- The link check is always done the same: entire site. Linkcheck 
+  is not dependant on permissions of user, only the link report is.
+  This means it is not necessary to recheck for anything for each
+  user.
+- The link check should be done via scheduler : show appropriate
+  hints. It can be started manually as well. 
+- provide wizards which already suggest sensible defaults 
+  (e.g. for scheduler)  
+
+GUI: General
+- Module now under Site Management (not in Info module)
+- Icon for Module
+
+GUI: List of broken links
+- Reduce width of some columns, e.g. merge anchor and url into 
+  1 column, truncate some strings
+- Add icons for view page, refresh
+- Edit icon: only show field with broken links
+
+# To be discussed / researched
+
+- What are the filter methods that are actually necessary and will be used:
+  - current: filter per page / subpages / level
+  - current: filter per linktype (page, file, external ...)
+  - new: filter per site
+  - new: filter per error type (404, 500, wrong domain, access denied etc.)
+  - new: filter per record type (table.field)
+
+- Currently we use the Links module under Site management. The page tree is 
+  not displayed. We cannot display links for current page and subpages. 
+  - Advantage is that we can display a wider list because the page tree
+    must not be displayed. We use a paging mechanism (max. 20 per page, customizable)
+  - Disadvantage: You can no longer select all links only for current page 
+    + subpages  
+
+
+# Incoming ideas
+
+
+
+# Description of current functionality (before rewrite)
+
+## Link checking
 
 Parameters:
 * TSconfig: searchFields (where to search for links: table.field)
@@ -46,39 +100,3 @@ Possible chnages:
 * make configuration unnecessary as far as possible - provide
   sane defaults
  
-
-## Changes:
-
-Rewrite:
-- Use Fluid instead of marker template
-- Change class structure, break up functions
-- Database access only in Repository
-- 
-
-General changes
-- There is only 1 configuration per site (for "Check Links"),
-  not page / user / group TSconfig
-- Some things that were set for "Link Check" will now only
-  be selectable for "Link Report" (if at all) : perms, showhidden
-- The link check is always done the same: entire site. Linkcheck 
-  is not dependant on permissions of user, the report is.
-  This means it is not necessary to recheck for each person
-- The link check should be done via scheduler : show appropriate
-  hints 
-- provide wizards which already suggest sensible defaults 
-  (e.g. for scheduler)  
-
-GUI: General
-- Module now under Site Management (not in Info module)
-- Icon for Module
-
-GUI: List of broken links
-- Reduce width of some columns, e.g. merge anchor and url into 
-  1 column, truncate some strings
-- Add icons for view page, refresh
-- Edit icon: only show field with broken links
-
-## Incoming ideas
-
-
-

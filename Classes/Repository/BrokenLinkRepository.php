@@ -18,42 +18,107 @@ namespace TYPO3\CMS\Linkvalidator\Repository;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Linkvalidator\Utility\BackendUserUtility;
 
 /**
  * Repository for broken links.
  */
 class BrokenLinkRepository
 {
-    /** @var TYPO3\CMS\Core\Database\Query\QueryBuilder */
-    protected $queryBuilder;
 
-
-    public function __construct()
+    /**
+     * @param int $startPage
+     * @param int $resultsPerPage
+     * @param bool $forCurrentBeUser : only results accessible for current BE-Usre
+     * @return array
+     */
+    public function findResults(int $currentPage=0, int $resultsPerPage=10, bool $forCurrentBeUser=true) : array
     {
-        $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_linkvalidator_link');
-    }
-
-    public function findAllResults(int $startResult=0, int $maxResults = 0) : array
-    {
-        $this->queryBuilder
+        $queryBuilder
             ->select('*')
             ->from('tx_linkvalidator_link')
+            ->join(
+                'tx_linkvalidator_link',
+              'pages',
+               'pages',
+                    $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier('tx_linkvalidator_link.record_pid'))
+            );
+
+        if ($forCurrentBeUser) {
+            $permsClause = BackendUserUtility::getPermsClause();
+            $queryBuilder
+                ->where($permsClause);
+        }
+
+        $queryBuilder
             ->orderBy('record_pid')
             ->addOrderBy('record_uid');
-        if ($maxResults) {
-            $this->queryBuilder->setMaxResult($maxResults);
+        if ($resultsPerPage) {
+            $queryBuilder->setMaxResults($resultsPerPage);
         }
-        if ($startResult) {
-            $this->queryBuilder->setFirstResult($startResult);
+        if ($currentPage) {
+            $startResult = $currentPage * $resultsPerPage;
+            $queryBuilder->setFirstResult($startResult);
         }
-        return $this->queryBuilder->execute()
+        return $queryBuilder->execute()
             ->fetchAll();
+
+    }
+
+    /**
+     * @param int $startPage
+     * @param int $resultsPerPage
+     * @return array
+     */
+    public function findResultsForCurrentBeUser(int $currentPage=0, int $resultsPerPage=10) : array
+    {
+       return $this->findResults($currentPage, $resultsPerPage, true);
+    }
+
+    /**
+     * @param bool $forCurrentBeUser If true, only results for current BE-User, if false: all results
+     * @return int
+     */
+    public function countResults(bool $forCurrentBeUser = true) : int
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_linkvalidator_link');
+
+        $queryBuilder
+            ->count('tx_linkvalidator_link.uid')
+            ->from('tx_linkvalidator_link')
+            ->join(
+                'tx_linkvalidator_link',
+                'pages',
+                'pages',
+                $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier('tx_linkvalidator_link.record_pid'))
+            );
+        if ($forCurrentBeUser) {
+            $permsClause = BackendUserUtility::getPermsClause();
+            $queryBuilder->
+            where($permsClause);
+        }
+        return (int)
+            $queryBuilder
+            ->orderBy('record_pid')
+            ->addOrderBy('record_uid')
+            ->execute()
+            ->fetchColumn(0);
+
+    }
+
+    public function countResultsForCurrentBeUser() : int
+    {
+        return $this->countResults(true);
     }
 
     public function removeAll()
     {
-        $this->queryBuilder->delete('tx_linkvalidator_link')
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_linkvalidator_link');
+        $queryBuilder->delete('tx_linkvalidator_link')
             ->execute();
     }
 
@@ -69,32 +134,33 @@ class BrokenLinkRepository
      * @param array $pageList
      * @param int $page
      * @return array
+     *
      * @deprecated this function is currently not used, check if it can be removed!
      */
     public function getResults(array $linkTypes, array $pageList, int $page = 0): array
     {
-        $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_linkvalidator_link');
-        $this->queryBuilder
+        $queryBuilder
             ->select('*')
             ->from('tx_linkvalidator_link')
             ->where(
-                $this->queryBuilder->expr()->in(
+                $queryBuilder->expr()->in(
                     'record_pid',
-                    $this->queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
+                    $queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
                 )
             )
             ->orderBy('record_pid')
             ->addOrderBy('record_uid');
 
         if (!empty($linkTypes)) {
-            $this->queryBuilder->andWhere(
-                $this->queryBuilder->expr()->in(
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->in(
                     'link_type',
-                    $this->queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
+                    $queryBuilder->createNamedParameter($linkTypes, Connection::PARAM_STR_ARRAY)
                 )
             );
         }
-        return $this->queryBuilder->execute();
+        return $queryBuilder->execute();
     }
 }
