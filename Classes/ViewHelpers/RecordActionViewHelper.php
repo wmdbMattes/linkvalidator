@@ -70,74 +70,10 @@ class RecordActionViewHelper extends AbstractViewHelper
                     'edit[' . $table . '][' . $uid . ']' => 'edit',
                     'columnsOnly'                        => $field,
                     'returnUrl'                          => (string)$uriBuilder->buildUriFromRoute('site_linkvalidator'),
-  /*                  'curUrl' => [
-                        'url'       => 'http://www.linkedin.com/groups?gid=70999',
-                        'target'    => '_blank',
-                        'title'     => 'Link to LinkedIn'
-                    ],
-  */
+
                 ];
                 $route = 'record_edit';
                 return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
-
-            /**
-             * Open Link Wizard. This does not work, because link
-             * wizard must be opened from rte, otherwise RteLinkBrowser.js
-             * finalizeFunction fails on
-             * RteLinkBrowser.CKEditor.document
-             *
-             * todo: either remove this or find another way
-             */
-            /*
-            case 'editlink':
-                $parameters = [
-                    'table'     => $table,
-                    'fieldName' => $field,
-                    'pid'       => $pid,
-                    'uid'       => $uid,
-                    'recordType' => ''
-                ];
-                $urlParameters = [
-                    'contentsLanguage' => 'en',
-                    // 'route'
-                    // 'token*
-                    'P' => $parameters,
-                    'curUrl' => [
-                        'url' => 'http://abc.de'
-                    ],
-                    'editorId' => 'cke_1'
-                ];
-                $route = 'rteckeditor_wizard_browse_links';
-                return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
-            */
-
-            case 'editlink':
-                $parameters = [
-                    'table'     => $table,
-                    'fieldName' => $field,
-                    'pid'       => $pid,
-                    'uid'       => $uid,
-                    'recordType' => ''
-                ];
-                $urlParameters = [
-                    'contentsLanguage' => 'en',
-                    // 'route'
-                    // 'token*
-                    'P' => $parameters,
-                    'curUrl' => [
-                        'url' => 'http://abc.de'
-                    ],
-                    'linkAttributes' => [
-                        'target' => 'http://abcsfsf.de',
-                        'title'  => '',
-                        'class'  => '',
-                        'params' => ''
-                    ],
-                    'editorId' => 'cke_1'
-                ];
-                $route = 'wizard_link';
-                return (string)$uriBuilder->buildUriFromRoute($route, $urlParameters);
-
 
             case 'view':
                 $pageId = $arguments['pid'];

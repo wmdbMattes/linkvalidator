@@ -34,6 +34,8 @@ abstract class AbstractLinktype implements LinktypeInterface
      * @param string $type Current type
      * @param string $key Validator hook name
      * @return string Fetched type
+     *
+     * @todo check if generic functions from LinkService can be used.
      */
     public function fetchType($value, $type, $key)
     {

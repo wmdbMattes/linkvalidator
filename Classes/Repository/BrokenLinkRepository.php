@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace TYPO3\CMS\Linkvalidator\Repository;
 
 /*
@@ -27,26 +28,63 @@ class BrokenLinkRepository
 {
 
     /**
+     * Check if current url is in list of broken urls.
+     *
+     * @param string $url
+     * @return bool
+     */
+    public function isBrokenUrl(string $url) : bool
+    {
+        try {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getQueryBuilderForTable('tx_linkvalidator_link');
+            $timelimit = time() - 86400;
+            $queryBuilder
+                ->count('tx_linkvalidator_link.uid')
+                ->from('tx_linkvalidator_link')
+                ->where(
+                    $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($url)),
+                    $queryBuilder->expr()->gt('last_check',
+                        $queryBuilder->createNamedParameter($timelimit, \PDO::PARAM_INT))
+                );
+            return
+                $queryBuilder
+                    ->execute()
+                    ->fetchColumn(0) > 0;
+        } catch (\Doctrine\DBAL\Exception\TableNotFoundException $e) {
+            return false;
+        }
+    }
+
+    /**
      * @param int $startPage
      * @param int $resultsPerPage
      * @param bool $forCurrentBeUser : only results accessible for current BE-Usre
      * @return array
      */
-    public function findResults(int $currentPage=0, int $resultsPerPage=10, bool $forCurrentBeUser=true) : array
+    public function findResults(int $currentPage = 0, int $resultsPerPage = 10, bool $forCurrentBeUser = true): array
     {
+        $fields = ['headline', 'link_title', 'url', 'url_response', 'record_uid', 'record_pid', 'field', 'table_name'];
+        array_walk($fields, function (&$value, $key) use (&$table) {
+            $value = 'tx_linkvalidator_link.' . $value;
+        });
+
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_linkvalidator_link');
         $queryBuilder
-            ->select('*')
-            ->from('tx_linkvalidator_link')
-            ->join(
-                'tx_linkvalidator_link',
-              'pages',
-               'pages',
-                    $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier('tx_linkvalidator_link.record_pid'))
-            );
-
+            ->select( ... $fields )
+            ->from('tx_linkvalidator_link');
         if ($forCurrentBeUser) {
+            $queryBuilder
+                ->join(
+                    'tx_linkvalidator_link',
+                    'pages',
+                    'pages',
+                    $queryBuilder->expr()->eq('pages.uid',
+                        $queryBuilder->quoteIdentifier('tx_linkvalidator_link.record_pid'))
+                );
+
+
             $permsClause = BackendUserUtility::getPermsClause();
             $queryBuilder
                 ->where($permsClause);
@@ -72,16 +110,16 @@ class BrokenLinkRepository
      * @param int $resultsPerPage
      * @return array
      */
-    public function findResultsForCurrentBeUser(int $currentPage=0, int $resultsPerPage=10) : array
+    public function findResultsForCurrentBeUser(int $currentPage = 0, int $resultsPerPage = 10): array
     {
-       return $this->findResults($currentPage, $resultsPerPage, true);
+        return $this->findResults($currentPage, $resultsPerPage, true);
     }
 
     /**
      * @param bool $forCurrentBeUser If true, only results for current BE-User, if false: all results
      * @return int
      */
-    public function countResults(bool $forCurrentBeUser = true) : int
+    public function countResults(bool $forCurrentBeUser = true): int
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_linkvalidator_link');
@@ -93,7 +131,8 @@ class BrokenLinkRepository
                 'tx_linkvalidator_link',
                 'pages',
                 'pages',
-                $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier('tx_linkvalidator_link.record_pid'))
+                $queryBuilder->expr()->eq('pages.uid',
+                    $queryBuilder->quoteIdentifier('tx_linkvalidator_link.record_pid'))
             );
         if ($forCurrentBeUser) {
             $permsClause = BackendUserUtility::getPermsClause();
@@ -101,15 +140,13 @@ class BrokenLinkRepository
             where($permsClause);
         }
         return (int)
-            $queryBuilder
-            ->orderBy('record_pid')
-            ->addOrderBy('record_uid')
+        $queryBuilder
             ->execute()
             ->fetchColumn(0);
 
     }
 
-    public function countResultsForCurrentBeUser() : int
+    public function countResultsForCurrentBeUser(): int
     {
         return $this->countResults(true);
     }

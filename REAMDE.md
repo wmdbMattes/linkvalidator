@@ -55,7 +55,16 @@ GUI: List of broken links
     + subpages  
 
 
-# Incoming ideas
+# draft / WIP
+
+## edit link
+
+* see SiteConfigurationController::editAction : creates edit form with customData
+* use data-rte-error to mark broken links 
+  * add option to edit_record to mark all broken links
+  * for all links check if they are in tx_linkvalidator_link and mark them if broken
+    in RteHtmlParser markBrokenLinks
+    - alternatively use a broken link cache?
 
 
 

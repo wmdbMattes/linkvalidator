@@ -29,7 +29,7 @@ CREATE TABLE tx_linkvalidator_link (
   record_path               varchar(255) DEFAULT '' NOT NULL,
   record_sitename           varchar(255) DEFAULT '' NOT NULL,
   record_type               varchar(255) DEFAULT '' NOT NULL,
-  headline           varchar(255) DEFAULT '' NOT NULL,
+  headline                  varchar(255) DEFAULT '' NOT NULL,
   field                     varchar(255) DEFAULT '' NOT NULL,
   table_name                varchar(255) DEFAULT '' NOT NULL,
   link_title                text,

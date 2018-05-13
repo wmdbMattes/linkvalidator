@@ -1,6 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:lv="http://typo3.org/ns/TYPO3/CMS/Linkvalidator/ViewHelpers" data-namespace-typo3-fluid="true">
 
-<f:debug title="out">{out}</f:debug>
+<f:debug title="results">{results}</f:debug>
 
 <f:comment>
     ---------- DISABLED -----------
@@ -152,7 +152,6 @@
                                 </f:link.external>
                             </f:comment>
                             <a class="btn btn-default"
-                               onclick="$().ready(function() {alert('loaded');});"
                                href="{lv:recordAction(command: 'edit', uid: result.record_uid, pid: result.record_pid, table: result.table_name, field: result.field)}"
                                title="{f:translate(key: 'LLL:EXT:lang/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
                                 <core:icon identifier="actions-open" />
@@ -164,12 +163,7 @@
                                title="Recheck link">
                                 <core:icon identifier="actions-synchronize" />
                             </a>
-                            <a class="btn btn-default"
-                               href="{lv:recordAction(command: 'editlink', uid: result.record_uid, pid: result.record_pid, table: result.table_name, field: result.field)}"
-                               title="Edit Link"
-                                >
-                                <core:icon identifier="overlay-external-link" />
-                            </a>
+
                         </div>
                     </td>
                 </tr>

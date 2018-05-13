@@ -349,13 +349,11 @@ class LinkAnalyzer
         list($results, $record) = $this->emitBeforeAnalyzeRecordSignal($results, $record, $table, $fields);
 
         // Put together content of all relevant fields
-        $haystack = '';
         /** @var $htmlParser HtmlParser */
         $htmlParser = GeneralUtility::makeInstance(HtmlParser::class);
         $idRecord = $record['uid'];
         // Get all references
         foreach ($fields as $field) {
-            $haystack .= $record[$field] . ' --- ';
             $conf = $GLOBALS['TCA'][$table]['columns'][$field]['config'];
             $valueField = $record[$field];
             // Check if a TCA configured field has soft references defined (see TYPO3 Core API document)
@@ -498,6 +496,7 @@ class LinkAnalyzer
      * @param string $curPage Comma separated list of page uids
      * @return array Marker array with the number of links found
      */
+    /*
     public function getLinkCounts($curPage)
     {
         $markerArray = [];
@@ -524,6 +523,7 @@ class LinkAnalyzer
         }
         return $markerArray;
     }
+    */
 
     /**
      * Calls TYPO3\CMS\Backend\FrontendBackendUserAuthentication::extGetTreeList.
